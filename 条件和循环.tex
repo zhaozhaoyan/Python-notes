@@ -1,0 +1,175 @@
+\documentclass{article}  
+\usepackage{CJKutf8}
+\usepackage{minted}
+\begin{document} 
+\hfuzz=\maxdimen
+\tolerance=10000
+\hbadness=10000
+\begin{CJK}{UTF8}{gbsn}  
+\title{第五章 条件和循环}
+\author{}
+\date{}
+\maketitle
+\part*{一、条件语句}
+\section*{1.Python之if语句}
+\subparagraph*{}
+计算机之所以能做很多自动化的任务，因为它可以自己做条件判断。
+\subparagraph*{}
+输入用户年龄，根据年龄打印不同的年龄，在Python中用if语句实现
+\begin{minted}{python}
+   age = 20
+if age >= 18:
+    print 'your age is', age
+    print 'adult'
+print 'END'
+\end{minted}
+\subparagraph*{}
+注意：Python代码的缩进规则：具有相同缩进的代码被视为代码块，上面的3，4行 print 语句就构成一个代码块（但不包括第5行的print）。如果 if 语句判断为 True，就会执行这个代码块。
+\subparagraph*{}
+缩进严格按照Python的习惯：4个空格，不要使用Tab，更不要使用混合Tab和空格，否则会因为缩进问题引起的语法错误
+\subparagraph*{}
+注意：if语句后接表达式，然后用：表示代码块开始
+\subparagraph*{}
+如果在Python的交互环境下敲代码，还要特别留意缩进，并且退出缩进要多敲一行回车：
+\begin{minted}{python}
+   age = 20
+if age >= 18:
+   print 'your age is', age
+   print 'adult'
+   
+   #your age is 20
+   #adult
+\end{minted}
+\section*{2.Python之if-else语句}
+\subparagraph*{}
+if...else语句：
+\begin{minted}{python}
+if age >= 18:
+    print 'adult'
+else:
+    print 'teenager'
+\end{minted}
+\subparagraph*{}
+利用 if ... else ... 语句，我们可以根据条件表达式的值为 True 或者 False ，分别执行 if 代码块或者 else 代码块。
+\subparagraph*{}
+注意：else后面有个“:”
+\section*{3.Python之if-elif-else语句}
+\subparagraph*{}
+一个if...else不够用：需要嵌套if...else语句，但是缩进会很难看
+\subparagraph*{}
+所以引入if...elif...else语句:
+\begin{minted}{python}
+if age >= 18:
+    print 'adult'
+elif age >= 6:
+    print 'teenager'
+elif age >= 3:
+    print 'kid'
+else:
+    print 'baby'
+\end{minted}
+\subparagraph*{}
+elif就是else if
+\subparagraph*{}
+特别注意：这一系列的条件判断会从上到下依次判断，如果某个判断为true，执行完对应的代码块，后面的条件判断就直接忽略，不再执行了
+\part*{二、循环语句}
+\section*{1.Python之for循环}
+\subparagraph*{}
+list或tuple可以表示一个有序集合。如果我们想依次访问一个list中的每一个元素呢？比如 list：但是元素多了就比较麻烦并且不切实际
+\subparagraph*{}
+Python的for循环就可以依次把list或Tuple的每个元素迭代出来
+\begin{minted}{python}
+L = ['Adam', 'Lisa', 'Bart']
+for name in L:
+    print name
+\end{minted}
+\subparagraph*{}
+注意：name这个变量是在for循环中定义的，意思是，依次取出list的每一个元素，并把元素赋值给name，然后执行for循环（就是缩进的代码块）
+\section*{2.Python之while循环}
+\subparagraph*{}
+while循环不会迭代list或Tuple中的元素，而是根据表达式判断循环是否结束
+\begin{minted}{python}
+N = 10
+x = 0
+while x < N:
+    print x
+    x = x + 1
+\end{minted}
+\subparagraph*{}
+while循环每次先判断x<N，如果为true ，则执行循环的代码块，否则，退出循环
+\subparagraph*{}
+在循环体内，x=x+1会让x不断增加，最终因为x<N不成立而退出循环
+\subparagraph*{}
+如果没有这一个语句，while循环在判断 x < N 时总是为True，就会无限循环下去，变成死循环，所以要特别留意while循环的退出条件。
+\section*{3.Python之break退出循环}
+\subparagraph*{}
+用 for 循环或者 while 循环时，如果要在循环体内直接退出循环，可以使用 break 语句。
+\subparagraph*{}
+计算1至100的整数和：
+\begin{minted}{python}
+sum = 0
+x = 1
+while True:
+    sum = sum + x
+    x = x + 1
+    if x > 100:
+        break
+print sum
+\end{minted}
+\subparagraph*{}
+注意：while True 就是一个死循环，但是在循环体内，我们还判断了 x > 100 条件成立时，用break语句退出循环，这样也可以实现循环的结束。
+\subparagraph*{}
+练习：利用 while True 无限循环配合 break 语句，计算 1 + 2 + 4 + 8 + 16 + ... 的前20项的和。
+\begin{minted}{python}
+sum = 0
+x = 1
+n = 1
+while True:
+    sum=sum+x
+    x=x*2
+    n=n+1
+    if n>20:
+       break
+print sum
+\end{minted}
+\section*{4.Python之continue继续循环}
+\subparagraph*{}
+continue跳过后续循环代码，继续下一次循环
+\subparagraph*{}
+利用for循环计算平均分的代码
+\begin{minted}{python}
+L = [75, 98, 59, 81, 66, 43, 69, 85]
+sum = 0.0
+n = 0
+for x in L:
+    sum = sum + x
+    n = n + 1
+print sum / n
+\end{minted}
+\subparagraph*{}
+只想统计及格分数的平均分，就要把 x < 60 的分数剔除掉，这时，利用 continue，可以做到当 x < 60的时候，不继续执行循环体的后续代码，直接进入下一次循环：
+\begin{minted}{python}
+for x in L:
+    if x < 60:
+        continue
+    sum = sum + x
+    n = n + 1
+\end{minted}
+\section*{5.Python之多重循环}
+\subparagraph*{}
+在循环内部，还可以嵌套循环，例如：
+\begin{minted}{python}
+for x in ['A', 'B', 'C']:
+    for y in ['1', '2', '3']:
+        print x + y
+\end{minted}
+\subparagraph*{}
+练习：对100以内的两位数，请使用一个两重循环打印出所有十位数字比个位数字小的数，例如，23（2$<$3）
+\begin{minted}{python}
+for x in [1,2,3,4,5,6,7,8,9]:
+    for y in [1,2,3,4,5,6,7,8,9]:
+        if x<y:
+            print x*10+y
+\end{minted}
+\end{CJK}
+\end{document}
