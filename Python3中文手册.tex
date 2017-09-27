@@ -1,6 +1,7 @@
 \documentclass{article}  
 \usepackage{CJKutf8}
 \usepackage{minted}
+\usepackage{graphicx}
 \begin{document} 
 \hfuzz=\maxdimen
 \tolerance=10000
@@ -473,19 +474,288 @@ The value of i is 65536
 （2）与其它语言不同，特殊字符例如 $\backslash$n 在单引号('...')和双引号("...")中具有相同的含义。两者唯一的区别是在单引号中，你不需要转义 " （但你必须转义 '$\backslash$' )，反之亦然。
 \part*{四、深入Python流程控制}
 \section*{1.if语句}
+\begin{minted}{python}
+>>> x = int(input("Please enter an integer: "))
+Please enter an integer: 42
+>>> if x < 0:
+...     x = 0
+...     print('Negative changed to zero')
+... elif x == 0:
+...     print('Zero')
+... elif x == 1:
+...     print('Single')
+... else:
+...     print('More')
+... 
+More
+#注意空格的缩进，4个空格，不然程序报错
+\end{minted}
+（1）可能会有零到多个 elif 部分，else 是可选的。关键字 ‘elif’ 是 ’else if’ 的缩写，这个可以有效地避免过深的缩进。\\
+（2）if … elif … elif … 序列用于替代其它语言中的 switch 或 case 语句。
 \section*{2.for语句}
+（1）Python 的 for 语句依据任意序列（链表或字符串）中的子项，按它们在序列中的顺序来进行迭代。例如（没有暗指）：
+\begin{minted}{python}
+>>> # Measure some strings:
+... words = ['cat', 'window', 'defenestrate']
+>>> for w in words:
+...     print(w, len(w))
+...
+cat 3
+window 6
+defenestrate 12
+\end{minted}
+（2）在迭代过程中修改迭代序列不安全（只有在使用链表这样的可变序列时才会有这样的情况）。如果你想要修改你迭代的序列（例如，复制选择项），你可以迭代它的复本。使用切割标识就可以很方便的做到这一点:
+\begin{minted}{python}
+>>> for w in words[:]:  # Loop over a slice copy of the entire list.
+...     if len(w) > 6:
+...         words.insert(0, w)
+...
+>>> words
+['defenestrate', 'cat', 'window', 'defenestrate']
+\end{minted}
 \section*{3.range()函数}
+(1)如果你需要一个数值序列，内置函数range()会很方便，他生成一个等差级数链表：
+\begin{minted}{python}
+>>> for i in range(5):
+...     print(i)
+... 
+0
+1
+2
+3
+4
+>>> 
+\end{minted}
+(2)range(10) 生成了一个包含 10 个值的链表，它用链表的索引值填充了这个长度为 10 的列表，所生成的链表中不包括范围中的结束值。也可以让 range() 操作从另一个数值开始，或者可以指定一个不同的步进值（甚至是负数，有时这也被称为 “步长”）:
+\begin{minted}{python}
+range(5, 10)
+   5 through 9
+
+range(0, 10, 3)
+   0, 3, 6, 9
+
+range(-10, -100, -30)
+  -10, -40, -70
+\end{minted}
+（3）需要迭代链表索引的话，如下所示结合使用range()和len()
+\begin{minted}{python}
+>>> a = ['Mary', 'had', 'a', 'little', 'lamb']
+>>> for i in range(len(a)):
+...     print(i, a[i])
+...
+0 Mary
+1 had
+2 a
+3 little
+4 lamb
+\end{minted}
+（4）这种场合可以方便地使用enumerate()，详情参见循环技巧
+
+（5）如果只打印一个序列会发生：
+\begin{minted}{python}
+>>> print(range(10))
+range(0, 10)
+\end{minted}
+（6）在不同方面 range() 函数返回的对象表现为它是一个列表，但事实上它并不是。当你迭代它时，它是一个能够像期望的序列返回连续项的对象；但为了节省空间，它并不真正构造列表。
+（7）此类对象是可迭代的，即适合作为那些期望从某些东西中获得连续项直到结束的函数或结构的一个目标（参数）。
+（8）for语句就是一个迭代器。list()函数是另一个迭代器，他从可迭代（对象）中创建链表：
+\begin{minted}{python}
+>>> list(range(5))
+[0, 1, 2, 3, 4]
+\end{minted}
 \section*{4.break和continue语句，以及循环中的else子句}
+\subsection*{break语句}
+（1）break语句：用于跳出最近一级for或while循环\\
+（2）循环可以有一个else子句；它在循环迭代完整个列表（对于for）或执行条件为false（对于while）时执行，但循环被break中止的情况下不会执行。以下搜索素数的示例程序演示了这个子句：
+\begin{minted}{python}
+>>> for n in range(2, 10):
+...     for x in range(2, n):
+...         if n % x == 0:
+...             print(n, 'equals', x, '*', n//x)
+...             break
+...     else:
+...         # loop fell through without finding a factor
+...         print(n, 'is a prime number')
+...
+2 is a prime number
+3 is a prime number
+4 equals 2 * 2
+5 is a prime number
+6 equals 2 * 3
+7 is a prime number
+8 equals 2 * 4
+9 equals 3 * 3
+#else语句是属于for循环之中，不是if语句
+\end{minted}
+（3）与循环一起使用时，else 子句与 try 语句的 else 子句比与 if 语句的具有更多的共同点：try 语句的 else 子句在未出现异常时运行，循环的 else 子句在未出现 break 时运行。更多关于 try 语句和异常的内容，请参见 异常处理。
+\subsection*{continue语句}
+continue：表示循环继续执行下一次迭代：
+\begin{minted}{python}
+>>> for num in range(2, 10):
+...     if num % 2 == 0:
+...         print("Found an even number", num)
+...         continue
+...     print("Found a number", num)
+Found an even number 2
+Found a number 3
+Found an even number 4
+Found a number 5
+Found an even number 6
+Found a number 7
+Found an even number 8
+Found a number 9
+\end{minted}
 \section*{5.pass语句}
+（1）pass语句什么都不做，它用于那些语法上必须要有什么语句，但程序什么也不做的场合，例如：
+\begin{minted}{python}
+>>> while True:
+...     pass  # Busy-wait for keyboard interrupt (Ctrl+C)
+...
+\end{minted}
+（2）这通常用于创建最小结构的类：
+\begin{minted}{python}
+>>> class MyEmptyClass:
+...     pass
+...
+
+\end{minted}
+（3）pass语句可以在创建新代码时用来做函数或控制体的占位符。可以让你在更抽象的级别上思考。pass 可以默默的被忽视:
+\begin{minted}{python}
+>>> def initlog(*args):
+...     pass   # Remember to implement this!
+...
+\end{minted}
 \section*{6.定义函数}
+（1）首先创建一个用来生成指定边界的斐波那列函数：
+\begin{minted}{python}
+>>> def fib(n):
+...     """Print a Fibonacci series up to n."""
+...     a,b=0,1
+...     while a<n:
+...         print(a,end=' ')
+...         a,b=b,a+b
+...     print()
+... 
+>>> #Now call the function we just defined:
+... fib(2000)
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 
+>>> 
+\end{minted}
+（2）关键字def引入了函数定义。在其后面必须跟有函数名和包括形式参数的圆括号。函数体语句从下一行开始，必须是缩进的。\\
+（3）函数体的第一句：可选的字符串文本，这个字符串是函数的文档字符串，或者成为docstrings（通过docstrings自动生成在线的或可打印的文档，或者让用户通过代码交互浏览;包含docstrings是个好的实践，要成为习惯）\\
+（4）函数调用：为函数局部变量生成一个新的符号表。\\
+所有函数中的变量赋值都是将值存储在局部符号表\\
+变量引用首先在局部符号中查找，然后是包含函数的局部符号表，然后是全局符号表，最后是内置名字表。\\
+（5）全局变量不能在函数中直接赋值（除非用global语句命名），尽管他们可以被引用。\\
+（6）函数引用的实际参数在函数调用时引入局部符号表，因此，实参总是传值调用（这里的值总是一个对象引用，而不是该对象的值）。\\
+（7）一个函数被另一个函数调用时，一个新的局部符号表在调用过程中被创建。\\
+（7*）实际上， 引用对象调用 描述的更为准确。如果传入一个可变对象，调用者会看到调用操作带来的任何变化（如子项插入到列表中）。\\
+（8）一个函数定义会在当前符号表内引入函数名。\\
+（9）函数名指代的值（即函数体）有一个被Python解释器认定为用户自定义函数的类型。这个值可以赋予其他的名字（即变量名），然后它也可以被当做函数使用。这可以作为通用的重命名机制：
+\begin{minted}{python}
+>>> fib
+<function fib at 0x7f41d48def28>
+>>> f=fib
+>>> f(100)
+0 1 1 2 3 5 8 13 21 34 55 89 
+\end{minted}
+（10）如果你使用过其他语言，你可能会反对说：fib 不是一个函数，而是一个方法，因为它并不返回任何值。事实上，没有 return 语句的函数确实会返回一个值，虽然是一个相当令人厌烦的值（指 None ）。这个值被称为 None （这是一个内建名称）。如果 None 值是唯一被书写的值，那么在写的时候通常会被解释器忽略（即不输出任何内容）。如果你确实想看到这个值的输出内容，请使用 print() 函数:
+\begin{minted}{python}
+>>> fib(0)
+
+>>> print(fib(0))
+
+None
+>>> 
+\end{minted}
+定义一个返回斐波那契数列数字列表的函数，而不是打印它，是很简单的:
+\begin{minted}{python}
+>>> def fib2(n): # return Fibonacci series up to n
+...     """Return a list containing the Fibonacci series up to n."""
+...     result = []
+...     a, b = 0, 1
+...     while a < n:
+...         result.append(a)    # see below
+...         a, b = b, a+b
+...     return result
+...
+>>> f100 = fib2(100)    # call it
+>>> f100                # write the result
+[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+>>> 
+\end{minted}
+\subparagraph*{}
+这个例子演示了一些新的Python功能：
+\subparagraph*{}
+（1）return语句从函数中返回一个值，不带表达式的 return 返回None；过程结束后也会返回None。
+\subparagraph*{}
+（2）语句result.append()称为链表对象result的一个方法。方法是一个“属于”某个对象的函数，它被命名为obj.methodename,这里的obj是某个对象（可能是一个表达式），methodename是某个在该对象类型定义的方法的命名。
+\subparagraph*{}
+（3）不同的类型定义不同的方法，不同类型可能有同样的名字的方法，但不会混淆。（当你定义自己的对象类型和方法时，可能会出现这种情况，class 的定义方法详见 类 ）。示例中演示的 append() 方法由链表对象定义，它向链表中加入一个新元素。在示例中它等同于 result = result + [a]，不过效率更高。
 \section*{7.深入Python函数定义}
+在Python中，也可以定义包含若干参数的函数。这里有三种可用的形式，也可以混合使用。
 \subsection*{(1)默认参数值}
 \subsection*{(2)关键字参数}
 \subsection*{(3)可变参数列表}
 \subsection*{(4)参数列表的分析}
 \subsection*{(5)Lambda形式}
 \subsection*{(6)文档字符串}
+\subparagraph*{}
+（1）第一行应该是关于对象用途的简介。简短起见，不用明确的陈述对象名或类型，因为它们可以从别的途径了解到（除非这个名字碰巧就是描述这个函数操作的动词）。这一行应该以大写字母开头，以句号结尾。
+\subparagraph*{}
+（2）如果文档字符串有多行，第二行应该空出来，与接下来的详细描述明确分隔。接下来的文档应该有一或多段描述对象的调用约定、边界效应等。
+\subparagraph*{}
+（3）Python 的解释器不会从多行的文档字符串中去除缩进，所以必要的时候应当自己清除缩进。这符合通常的习惯。第一行之后的第一个非空行决定了整个文档的缩进格式。（我们不用第一行是因为它通常紧靠着起始的引号，缩进格式显示的不清楚。）留白“相当于”是字符串的起始缩进。每一行都不应该有缩进，如果有缩进的话，所有的留白都应该清除掉。留白的长度应当等于扩展制表符的宽度（通常是8个空格）。
+\subparagraph*{}
+一个多行文档字符串的示例:
+\begin{minted}{python}
+>>> def my_function():
+...     """Do nothing, but document it.
+...
+...     No, really, it doesn't do anything.
+...     """
+...     pass
+...
+>>> print(my_function.__doc__)
+Do nothing, but document it.
+
+    No, really, it doesn't do anything.
+\end{minted}
 \subsection*{(7)函数注解}
+\subparagraph*{}
+是关于用户自定义的函数的完全可选的、随意的元数据信息。无论 Python 本身或者标准库中都没有使用函数注解；本节只是描述了语法。第三方的项目是自由地为文档，类型检查，以及其它用途选择函数注解。
+\subparagraph*{}
+注解是以字典形式存储在函数的 \_{}annotations\_{}属性中，对函数的其它部分没有任何影响。参数注解（Parameter annotations）是定义在参数名称的冒号后面，紧随着一个用来表示注解的值得表达式。返回注释（Return annotations）是定义在一个-$>$ 后面，紧随着一个表达式，在冒号与-$>$之间。下面的示例包含一个位置参数，一个关键字参数，和没有意义的返回值
+\subparagraph*{}
+注释示例：
+\begin{minted}{python}
+>>> def f(ham: 42, eggs: int = 'spam') -> "Nothing to see here":
+...     print("Annotations:", f.__annotations__)
+...     print("Arguments:", ham, eggs)
+...
+>>> f('wonderful')
+Annotations: {'eggs': <class 'int'>, 'return': 'Nothing to see here', 'ham': 42}
+Arguments: wonderful spam
+\end{minted}
 \section*{8.插曲：编码风格}
+\subparagraph*{}
+写更长更复杂的程序时，讨论编码风格让程序更易读：
+\subparagraph*{}
+对于Python，PEP 8 引入的项目遵循的风格：
+\begin{itemize}
+  \item 使用 4 空格缩进，而非 TAB\\
+  在小缩进（可以嵌套更深）和大缩进（更易读）之间，4空格是一个很好的折中。TAB会引发一些混乱，弃用。
+  \item 折行以确保其不会超过 79 个字符\\
+  这有助于小显示器用户阅读，也可以让大显示器能并排显示几个代码文件
+  \item 使用空行分隔函数和类，以及函数中的大块代码
+  \item 可能的话，注释独占一行
+  \item 使用文档字符串
+  \item 把空格放到操作符两边，以及逗号后面，但是括号里侧不加空格：a = f(1,2)+g(3,4)
+  \item 统一函数和类命名\\
+  推荐类名用驼峰命名，函数和方法名用 小写\_{}和
+  \_{}下划线。总是用self作为方法的第一个参数
+  \item 不要使用花哨的编码，如果你的代码的目的是要在国际化环境。Python的默认情况下，UTF-8，甚至普通的 ASCII 总是工作的最好
+  \item 不要使用非 ASCII 字符的标识符，除非是不同语种的会阅读或者维护代码。
+\end{itemize}
 \end{CJK}
 \end{document}
