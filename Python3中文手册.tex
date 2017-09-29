@@ -974,9 +974,1075 @@ Arguments: wonderful spam
 \end{itemize}
 \part*{五、数据结构}
 \section*{1.关于列表}
+\begin{minted}{python}
+list.append(x)
+#把一个元素添加到列表的结尾，相当于a[len(a):]=[x]
+list.extend(L)
+#将一个给定列表中的所有元素都添加到另一个列表中，相当于a[len(a):]=L
+list.insert(i,x)
+#在指定位置插入一个元素。第一个参数是准备插入到其前面的那个元素的指引，例如a.insrert(0,x)会插入到整个列表之前，而a.insert(len(a),x)相当于a.append(x)。
+list,remove(x)
+#删除列表中值为x的第一个元素。如果没有这样的元素，就会返回一个错误。
+list.pop([i])
+#从列表的指定位置删除元素，并将其返回。如果没有指定索引，a.pop() 返回最后一个元素。元素随即从列表中被删除（方法中 i 两边的方括号表示这个参数是可选的，而不是要求你输入一对方括号。
+list.clear()
+#从列表中删除所有的元素。相当于del a[:]
+list.index(x)
+#返回列表中第一个值为x的元素的索引。如果没有匹配的就会返回一个错误。
+list.count(x)
+#返回x在列表中出现的次数。
+list.sort()
+#对列表中的元素就地进行排序。
+list.reverse()
+#就地倒排列表中的元素。
+list.copy()
+#返回列表的一个浅拷贝。等同于a[:]。
+\end{minted}
+示例：
+\begin{minted}{python}
+>>> a=[66.25,333,333,1,1234.5]
+>>> print(a.count(333),a.count(66.25),a.count('x'))
+2 1 0
+>>> a.insert(2,-1)
+>>> a.append(333)
+>>> a
+[66.25, 333, -1, 333, 1, 1234.5, 333]
+>>> a.index(333)
+1
+>>> a.remove(333)
+>>> a
+[66.25, -1, 333, 1, 1234.5, 333]
+>>> a.reverse()
+>>> a
+[333, 1234.5, 1, 333, -1, 66.25]
+>>> a.sort()
+>>> a
+[-1, 1, 66.25, 333, 333, 1234.5]
+>>> a.pop()
+1234.5
+>>> a
+[-1, 1, 66.25, 333, 333]
+>>> 
+\end{minted}
+注意：像insert，remove或者sort这些修改列表的方法没有打印返回值，它们返回None；别的语言可能会返回一个变化的对象，允许方法连续执行，像
+\begin{minted}{c++}
+d->insert("a")->remove("b")->sort();
+\end{minted}
 \subsection*{(1)把列表当作堆栈使用}
+\subparagraph*{}
+列表作为一个堆栈来使用：堆栈作为特定的数据结构，最先进入的元素最后一个被释放（后进先出）。\\
+（1）用 append() 方法可以把一个元素添加到堆栈顶；\\
+（2）用不指定索引的 pop() 方法可以把一个元素从堆栈顶释放出来。例如:
+\begin{minted}{python}
+>>> stack=[3,4,5]
+>>> stack.append(6)
+>>> stack.append(7)
+>>> stack
+[3, 4, 5, 6, 7]
+>>> stack.pop()
+7
+>>> stack
+[3, 4, 5, 6]
+>>> stack.pop()
+6
+>>> stack.pop()
+5
+>>> stack
+[3, 4]
+>>> 
+\end{minted}
 \subsection*{(2)把列表当作队列使用}
+\subparagraph*{}
+列表当作队列来使用：堆栈作为特定的数据结构，最先进入的元素最先释放（先进先出）。
+\subparagraph*{}
+列表这样用效率不高。相对来说从列表末尾添加和弹出很快；在头部插入和弹出很慢（因为为了一个元素，要移动整个列表中的所有元素）。
+\begin{minted}{python}
+>>> from collections import deque
+>>> queue = deque(["Eric", "John", "Michael"])
+>>> queue.append("Terry")           # Terry arrives
+>>> queue.append("Graham")          # Graham arrives
+>>> queue.popleft()                 # The first to arrive now leaves
+'Eric'
+>>> queue.popleft()                 # The second to arrive now leaves
+'John'
+>>> queue                           # Remaining queue in order of arrival
+deque(['Michael', 'Terry', 'Graham'])
+>>>
+\end{minted}
 \subsection*{(3)列表推导式}
+\subparagraph*{}
+列表推导式为从序列中创建列表提供了一个简单的办法。普通的应用程式通过将一些操作应用于序列的每个成员并通过返回的元素创建列表，或者通过满足特定条件的元素创建子序列。
+\subparagraph*{}
+例如：假设我们创建一个squares列表，可以像下面方式：
+\begin{minted}{python}
+>>> squares = []
+>>> for x in range(10):
+...     squares.append(x**2)
+... 
+>>> squares
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+>>> 
+\end{minted}
+\subparagraph*{}
+注意：for循环中的被创建（或被重写）的名为x的变量在循环完毕后依然存在。如下方法可以计算squares的值，但是不会产生任何的副作用：
+    \begin{minted}{python}
+    squares = list(map(lambda x: x**2, range(10)))
+    \end{minted}
+或者等价于：
+    \begin{minted}{python}
+    squares = [x**2 for x in range(10)]
+    \end{minted}
+\subparagraph*{}
+列表推导式：由包含一个表达式的括号组成，表达式后面跟随一个for子句，之后可以有零或多个for或if子句。结果是一个列表，由表达式依据其后面的for和if子句上下文计算而来的结果构成。
+\subparagraph*{}
+如下的列表推导式结合两个列表的元素，如果元素之间不相等的话：
+\begin{minted}{python}
+>>> [(x,y) for x in [1,2,3] for y in [3,1,4] if x!=y ]
+[(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
+>>> 
+\end{minted}
+\subparagraph*{}
+等同于：
+\begin{minted}{python}
+>>> combs = []
+>>> for x in [1,2,3]:
+...     for y in [3,1,4]:
+...         if x != y:
+...             combs.append((x, y))
+...
+>>> combs
+[(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
+\end{minted}
+注意：上面两个方法中的for和if语句的顺序。
+\subparagraph*{}
+想要得到一个元组，例如上面例子中的（x,y）,必须要加上括号：
+\begin{minted}{python}
+>>> vec = [-4, -2, 0, 2, 4]
+>>> # create a new list with the values doubled
+>>> [x*2 for x in vec]
+[-8, -4, 0, 4, 8]
+>>> # filter the list to exclude negative numbers
+>>> [x for x in vec if x >= 0]
+[0, 2, 4]
+>>> # apply a function to all the elements
+>>> [abs(x) for x in vec]
+[4, 2, 0, 2, 4]
+>>> # call a method on each element
+>>> freshfruit = ['  banana', '  loganberry ', 'passion fruit  ']
+>>> [weapon.strip() for weapon in freshfruit]
+['banana', 'loganberry', 'passion fruit']
+>>> # create a list of 2-tuples like (number, square)
+>>> [(x, x**2) for x in range(6)]
+[(0, 0), (1, 1), (2, 4), (3, 9), (4, 16), (5, 25)]
+>>> # the tuple must be parenthesized, otherwise an error is raised
+>>> [x, x**2 for x in range(6)]
+  File "<stdin>", line 1, in ?
+    [x, x**2 for x in range(6)]
+               ^
+SyntaxError: invalid syntax
+>>> # flatten a list using a listcomp with two 'for'
+>>> vec = [[1,2,3], [4,5,6], [7,8,9]]
+>>> [num for elem in vec for num in elem]
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+\end{minted}
+\subparagraph*{}
+列表推导式可以使用复杂的表达式和嵌套函数：
+    \begin{minted}{python}
+    >>> from math import pi
+    >>> [str(round(pi, i)) for i in range(1, 6)]
+    ['3.1', '3.14', '3.142', '3.1416', '3.14159']
+    \end{minted}
 \subsection*{(4)嵌套的列表推导式}
+列表解析中的第一个表达式可以是任何表达式，包括列表解析。
+\subparagraph*{}
+一个由三个长度为4的列表组成的3×4矩阵：
+    \begin{minted}{python}
+    >>> matrix = [
+    ...     [1, 2, 3, 4],
+    ...     [5, 6, 7, 8],
+    ...     [9, 10, 11, 12],
+    ... ]
+    \end{minted}
+\subparagraph*{}
+交换行和列：用嵌套的列表推导式：
+    \begin{minted}{python}
+    >>> [[row[i] for row in matrix] for i in range(4)]
+    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+    \end{minted}
+\subparagraph*{}
+嵌套的列表推导式是对 for 后面的内容进行求值，所以上例就等价于:
+    \begin{minted}{python}
+    >>> transposed = []
+    >>> for i in range(4):
+    ...     transposed.append([row[i] for row in matrix])
+    ...
+    >>> transposed
+    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+\end{minted}
+\subparagraph*{}
+反之也是一样的：
+    \begin{minted}{python}
+    >>> transposed = []
+    >>> for i in range(4):
+    ...     # the following 3 lines implement the nested listcomp
+    ...     transposed_row = []
+    ...     for row in matrix:
+    ...         transposed_row.append(row[i])
+    ...     transposed.append(transposed_row)
+    ...
+    >>> transposed
+    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+\end{minted}
+\subparagraph*{}
+使用内置函数组成复杂流程语句，zip()函数：
+   \begin{minted}{python}
+    >>> list(zip(*matrix))
+    [(1, 5, 9), (2, 6, 10), (3, 7, 11), (4, 8, 12)]
+   \end{minted}
+\section*{2.del语句}
+\subparagraph*{}
+del语句：从列表中按给定的索引而不是值来删除一个子项，它不同于有返回值的pop()方法。
+\subparagraph*{}
+del语句：可以从列表中删除切片或清空整个列表（将空列表赋值给列表的切片），例如：
+    \begin{minted}{python}
+    >>> a = [-1, 1, 66.25, 333, 333, 1234.5]
+    >>> del a[0]
+    >>> a
+    [1, 66.25, 333, 333, 1234.5]
+    >>> del a[2:4]
+    >>> a
+    [1, 66.25, 1234.5]
+    >>> del a[:]
+    >>> a
+    []
+    \end{minted}
+\subparagraph*{}
+del语句：可以删除整个变量
+   \begin{minted}{python}
+   >>> del a
+   \end{minted}        
+此后再引用命名 a 会引发错误（直到另一个值赋给它为止）。
+\section*{3.元组和序列}
+列表和字符串是序列类型，另一个标准序列类型：元组\\
+一个元组由数个逗号分隔的值组成，例如：
+\begin{minted}{python}
+>>> t = 12345, 54321, 'hello!'
+>>> t[0]
+12345
+>>> t
+(12345, 54321, 'hello!')
+>>> # Tuples may be nested:
+... u = t, (1, 2, 3, 4, 5)
+>>> u
+((12345, 54321, 'hello!'), (1, 2, 3, 4, 5))
+>>> # Tuples are immutable:
+... t[0] = 88888
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'tuple' object does not support item assignment
+>>> # but they can contain mutable objects:
+... v = ([1, 2, 3], [3, 2, 1])
+>>> v
+([1, 2, 3], [3, 2, 1])
+\end{minted}
+\subparagraph*{}
+元组在输出时总是有括号的，以便于正确表达嵌套结构。在输入时可以有或没有括号，不过经常括号都是必须的（如果元组是一个更大的表达式的一部分）。
+不能给元组的一个独立的元素赋值（尽管你可以通过联接和切割来模拟）,还可以创建包含可变对象的元组，例如列表。
+\subparagraph*{}
+元组有很多用途。例如 (x, y) 坐标对，数据库中的员工记录等等。元组就像字符串， 不可变的。通常包含不同种类的元素并通过分拆（参阅本节后面的内容) 或索引访问（如果是 namedtuples，甚至可以通过属性）。列表是 可变的 ，它们的元素通常是相同类型的并通过迭代访问。
+\subparagraph*{}
+一个特殊的问题是构造包含零个或一个元素的元组：为了适应这种情况，语法上有一些额外的改变。一对空的括号可以创建空元组；要创建一个单元素元组可以在值后面跟一个逗号（在括号中放入一个单值不够明确）例如:
+    \begin{minted}{python}
+    >>> empty = ()
+    >>> singleton = 'hello',    # <-- note trailing comma
+    >>> len(empty)
+    0
+    >>> len(singleton)
+    1
+    >>> singleton
+    ('hello',)
+\end{minted}
+\subparagraph*{}
+语句 t = 12345, 54321, 'hello!' 是 元组封装 （tuple packing）的一个例子：值 12345 ， 54321 和 'hello!' 被封装进元组。其逆操作可能是这样:
+\begin{minted}{python}
+    >>> x, y, z = t
+\end{minted}
+\subparagraph*{}
+这个调用等号右边可以是任何线性序列，称之为 序列拆封 非常恰当。序列拆封要求左侧的变量数目与序列的元素个数相同。要注意的是可变参数（multiple assignment ）其实只是元组封装和序列拆封的一个结合。
+\section*{4.集合Set}
+\subparagraph*{}
+集合是一个无序不重复元素的集。基本功能包括关系测试和消除重复元素。
+\subparagraph*{}
+集合对象还支持 union（联合），intersection（交），difference（差）和 sysmmetric difference（对称差集）等数学运算。
+\subparagraph*{}
+大括号或 set() 函数可以用来创建集合。
+\subparagraph*{}
+注意：想要创建空集合，你必须使用 set() 而不是 {}。后者用于创建空字典，我们在下一节中介绍的一种数据结构。
+示例：
+\begin{minted}{python}
+>>> basket = {'apple', 'orange', 'apple', 'pear', 'orange', 'banana'}
+>>> print(basket)                      # show that duplicates have been removed
+{'orange', 'banana', 'pear', 'apple'}
+>>> 'orange' in basket                 # fast membership testing
+True
+>>> 'crabgrass' in basket
+False
+
+>>> # Demonstrate set operations on unique letters from two words
+...
+>>> a = set('abracadabra')
+>>> b = set('alacazam')
+>>> a                                  # unique letters in a
+{'a', 'r', 'b', 'c', 'd'}
+>>> a - b                              # letters in a but not in b
+{'r', 'd', 'b'}
+>>> a | b                              # letters in either a or b
+{'a', 'c', 'r', 'd', 'b', 'm', 'z', 'l'}
+>>> a & b                              # letters in both a and b
+{'a', 'c'}
+>>> a ^ b                              # letters in a or b but not both
+{'r', 'd', 'b', 'm', 'z', 'l'}
+\end{minted}
+\subparagraph*{}
+集合推导式：（类似于列表推导式）
+\begin{minted}{python}
+>>> a = {x for x in 'abracadabra' if x not in 'abc'}
+>>> a
+{'r', 'd'}
+\end{minted}
+\section*{5.字典}
+\subparagraph*{}
+Python内建数据类型：字典，字典在某些语言中可能称为 联合内存 （ associative memories ）或 联合数组 （ associative arrays ）。
+\subparagraph*{}
+序列是以连续的整数为索引，与此不同的是，字典以 关键字 为索引，关键字可以是任意不可变类型，通常用字符串或数值。如果元组中只包含字符串和数字，它可以做为关键字，如果它直接或间接的包含了可变对象，就不能当做关键字。不能用列表做关键字，因为列表可以用索引、切割或者 append() 和 extend() 等方法改变。
+\subparagraph*{}
+理解字典的最佳方式是把它看做无序的键： 值对 （key:value 对）集合，键必须是互不相同的（在同一个字典之内）。一对大括号创建一个空的字典： {} 。初始化列表时，在大括号内放置一组逗号分隔的键：值对，这也是字典输出的方式。
+\subparagraph*{}
+字典的主要操作是依据键来存储和析取值。也可以用 del 来删除键：值对（key:value）。如果你用一个已经存在的关键字存储值，以前为该关键字分配的值就会被遗忘。试图从一个不存在的键中取值会导致错误。
+\subparagraph*{}
+对一个字典执行 list(d.keys()) 将返回一个字典中所有关键字组成的无序列表（如果你想要排序，只需使用 sorted(d.keys()) ）。[2] 使用 in 关键字（指Python语法）可以检查字典中是否存在某个关键字（指字典）。
+\subparagraph*{}
+示例：
+\begin{minted}{python}
+>>> tel = {'jack': 4098, 'sape': 4139}
+>>> tel['guido'] = 4127
+>>> tel
+{'sape': 4139, 'guido': 4127, 'jack': 4098}
+>>> tel['jack']
+4098
+>>> del tel['sape']
+>>> tel['irv'] = 4127
+>>> tel
+{'guido': 4127, 'irv': 4127, 'jack': 4098}
+>>> list(tel.keys())
+['irv', 'guido', 'jack']
+>>> sorted(tel.keys())
+['guido', 'irv', 'jack']
+>>> 'guido' in tel
+True
+>>> 'jack' not in tel
+False
+\end{minted}
+\subparagraph*{}
+dict() 构造函数可以直接从 key-value 对中创建字典:
+\begin{minted}{python}
+>>> dict([('sape', 4139), ('guido', 4127), ('jack', 4098)])
+{'sape': 4139, 'jack': 4098, 'guido': 4127}
+\end{minted}
+字典推导式可以从任意的键值表达式中创建字典:
+\begin{minted}{python}
+>>> {x: x**2 for x in (2, 4, 6)}
+{2: 4, 4: 16, 6: 36}
+\end{minted}
+如果关键字都是简单的字符串，通过关键字参数指定key-value对更为方便:
+\begin{minted}{python}
+>>> dict(sape=4139, guido=4127, jack=4098)
+{'sape': 4139, 'jack': 4098, 'guido': 4127}
+\end{minted}
+\section*{6.循环技巧}
+在字典中循环时，关键字和对应的值可以使用items()方法同时解读出来：
+\begin{minted}{python}
+>>> knights = {'gallahad': 'the pure', 'robin': 'the brave'}
+>>> for k, v in knights.items():
+...     print(k, v)
+...
+gallahad the pure
+robin the brave
+\end{minted}
+在序列中循环时，索引位置和对应值可以使用 enumerate() 函数同时得到:
+\begin{minted}{python}
+>>> for i, v in enumerate(['tic', 'tac', 'toe']):
+...     print(i, v)
+...
+0 tic
+1 tac
+2 toe
+\end{minted}
+同时循环两个或更多的序列，可以使用 zip() 整体打包:
+\begin{minted}{python}
+>>> questions = ['name', 'quest', 'favorite color']
+>>> answers = ['lancelot', 'the holy grail', 'blue']
+>>> for q, a in zip(questions, answers):
+...     print('What is your {0}?  It is {1}.'.format(q, a))
+...
+What is your name?  It is lancelot.
+What is your quest?  It is the holy grail.
+What is your favorite color?  It is blue.
+\end{minted}
+要按排序后的顺序循环序列的话，使用 sorted() 函数，它不改动原序列，而是生成一个新的已排序的序列:
+\begin{minted}{python}
+>>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
+>>> for f in sorted(set(basket)):
+...     print(f)
+...
+apple
+banana
+orange
+pear
+\end{minted}
+若要在循环内部修改正在遍历的序列（例如复制某些元素），首先制作副本，在序列上循环不会隐式地创建副本，切片表示法很方便:
+\begin{minted}{python}
+>>> words = ['cat', 'window', 'defenestrate']
+>>> for w in words[:]:  # Loop over a slice copy of the entire list.
+...     if len(w) > 6:
+...         words.insert(0, w)
+...
+>>> words
+['defenestrate', 'cat', 'window', 'defenestrate']
+\end{minted}
+\section*{7.深入条件控制}
+\subparagraph*{}
+while 和 if 语句中使用的条件不仅可以使用比较，而且可以包含任意的操作。
+\subparagraph*{}
+比较操作符 in 和 not in 审核值是否在一个区间之内。操作符 is 和 is not 比较两个对象是否相同；这只和诸如列表这样的可变对象有关。所有的比较操作符具有相同的优先级，低于所有的数值操作。
+\subparagraph*{}
+比较操作可以传递。例如 a < b == c 审核是否 a 小于 b 并且 b 等于 c。
+\subparagraph*{}
+比较操作可以通过逻辑操作符 and 和 or 组合，比较的结果可以用 not 来取反义。这些操作符的优先级又低于比较操作符，在它们之中，not 具有最高的优先级， or 优先级最低，所以 A and not B or C 等于 (A and (notB)) or C。当然，括号也可以用于比较表达式。
+\subparagraph*{}
+逻辑操作符 and 和 or 也称作短路操作符：它们的参数从左向右解析，一旦结果可以确定就停止。例如，如果 A 和 C 为真而 B 为假， A and B and C 不会解析 C。作用于一个普通的非逻辑值时，短路操作符的返回值通常是最后一个变量。
+\subparagraph*{}
+可以把比较或其它逻辑表达式的返回值赋给一个变量，例如:
+\begin{minted}{python}
+>>> string1, string2, string3 = '', 'Trondheim', 'Hammer Dance'
+>>> non_null = string1 or string2 or string3
+>>> non_null
+'Trondheim'
+\end{minted}
+\subparagraph*{}
+注意：Python 与 C 不同，在表达式内部不能赋值。C 程序员经常对此抱怨，不过它避免了一类在 C 程序中司空见惯的错误：想要在解析式中使 == 时误用了 = 操作符。
+\section*{8.比较序列和其它类型}
+\subparagraph*{}
+序列对象可以与相同类型的其它对象比较。
+\subparagraph*{}
+比较操作按 字典序 进行：首先比较前两个元素，如果不同，就决定了比较的结果；如果相同，就比较后两个元素，依此类推，直到所有序列都完成比较。
+\subparagraph*{}
+如果两个元素本身就是同样类 型的序列，就递归字典序比较。如果两个序列的所有子项都相等，就认为序列相等。如果一个序列是另一个序列的初始子序列，较短的一个序列就小于另一个。
+\subparagraph*{}
+字符串的字典序按照单字符的 ASCII 顺序。
+\subparagraph*{}
+同类型序列之间比较的实例：
+\begin{minted}{python}
+(1, 2, 3)              < (1, 2, 4)
+[1, 2, 3]              < [1, 2, 4]
+'ABC' < 'C' < 'Pascal' < 'Python'
+(1, 2, 3, 4)           < (1, 2, 4)
+(1, 2)                 < (1, 2, -1)
+(1, 2, 3)             == (1.0, 2.0, 3.0)
+(1, 2, ('aa', 'ab'))   < (1, 2, ('abc', 'a'), 4)
+\end{minted}
+\subparagraph*{}
+注意：如果通过 < 或者 > 比较的对象只要具有合适的比较方法就是合法的。比如：混合数值类型是通过它们的数值进行比较的，所以 0 是等于 0.0 。否则解释器将会触发一个 TypeError 异常，而不是提供一个随意的结果。
+\part*{六、模块}
+\subparagraph*{}
+脚本：如果你想要编写一些更大的程序，为准备解释器输入使用一个文本编辑器会更好，并以那个文件替代作为输入执行。
+\subparagraph*{}
+模块：Python 提供了一个方法可以从文件中获取定义，在脚本或者解释器的一个交互式实例中使用。这样的文件被称为模块。
+\subparagraph*{}
+模块中的定义可以 导入 到另一个模块或 主模块 中（在脚本执行时可以调用的变量集位于最高级，并且处于计算器模式）。
+模块是包括 Python 定义和声明的文件。文件名就是模块名加上 .py 后缀。模块的模块名（做为一个字符串）可以由全局变量 \_{}name\_{} 得到。
+\subparagraph*{}
+例如，可以用自己惯用的文件编辑器在当前目录下创建一个叫 fibo.py 的文件，录入如下内容:
+\begin{minted}{python}
+# Fibonacci numbers module
+
+def fib(n):    # write Fibonacci series up to n
+    a, b = 0, 1
+    while b < n:
+        print(b, end=' ')
+        a, b = b, a+b
+    print()
+
+def fib2(n): # return Fibonacci series up to n
+    result = []
+    a, b = 0, 1
+    while b < n:
+        result.append(b)
+        a, b = b, a+b
+    return result
+\end{minted}
+\subparagraph*{}
+现在进入 Python 解释器并使用以下命令导入这个模块:
+\begin{minted}{python}
+>>> import fibo
+\end{minted}
+\subparagraph*{}
+这样做不会直接把 fibo 中的函数导入当前的语义表；它只是引入了模块名 fibo。你可以通过模块名按如下方式访问这个函数:
+\begin{minted}{python}
+>>> fibo.fib(1000)
+1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
+>>> fibo.fib2(100)
+[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+>>> fibo.__name__
+'fibo'
+\end{minted}
+如果打算频繁使用一个函数，你可以将它赋予一个本地变量:
+\begin{minted}{python}
+>>> fib = fibo.fib
+>>> fib(500)
+1 1 2 3 5 8 13 21 34 55 89 144 233 377
+\end{minted}
+\section*{1.深入模块}
+\subparagraph*{}
+除了包含函数定义外：模块也可以包含可执行语句。\\
+这些语句一般用来初始化模块。
+\subparagraph*{}
+每个模块都有自己私有的符号表，被模块内所有的函数定义作为全局符号表使用。因此，模块的作者可以在模块内部使用全局变量，而无需担心它与某个用户的全局变量意外冲突。从另一个方面讲，如果你确切的知道自己在做什么，你可以使用引用模块函数的表示法访问模块的全局变量，modname.itemname。
+\subparagraph*{}
+模块可以导入其他的模块。一个（好的）习惯是将所有的 import 语句放在模块的开始（或者是脚本），这并非强制。被导入的模块名会放入当前模块的全局符号表中。
+\subparagraph*{}
+import语句的一个变体直接从被导入的模块中导入命名到本模块的语义表中。例如:
+\begin{minted}{python}
+>>> from fibo import fib, fib2
+>>> fib(500)
+1 1 2 3 5 8 13 21 34 55 89 144 233 377
+\end{minted}
+这样不会从局域语义表中导入模块名（如上所示， fibo 没有定义）。
+\subparagraph*{}
+甚至有种方式可以导入模块中的所有定义:
+\begin{minted}{python}
+>>> from fibo import *
+>>> fib(500)
+1 1 2 3 5 8 13 21 34 55 89 144 233 377
+\end{minted}
+\subparagraph*{}
+这样可以导入所有除了以下划线(\_{})开头的命名。
+\subparagraph*{}
+在实践中往往不鼓励从一个模块或包中使用*导入所有，因为这样会让代码变得很难读。不过，在交互式会话中这样用很方便省力。
+\subparagraph*{}
+注解：出于性能考虑，每个模块在每个解释器会话中只导入一遍。因此，如果你修改了你的模块，需要重启解释器；或者，如果你就是想交互式的测试这么一个模块，可以用 imp.reload() 重新加载，例如：
+\begin{minted}{python}
+import imp; imp.reload(modulename)
+\end{minted}
+\subsection*{(1)作为脚本来执行模块}
+使用以下方式运行Python模块时，模块中的代码便会被执行：
+\begin{minted}{python}
+python fibo.py <arguments>
+\end{minted}
+模块中的代码会被执行，就像导入它一样，不过此时 \_{}name\_{} 被设置为 "\_{}main\_{}"。这相当于，如果你在模块后加入如下代码:
+\begin{minted}{python}
+if \_{}name\_{} == "\_{}main\_{}":
+    import sys
+    fib(int(sys.argv[1]))
+\end{minted}
+可以让此文件像作为模块导入时一样作为脚本执行。此代码只有在模块作为 “main” 文件执行时才被调用:
+\begin{minted}{python}
+python fibo.py 50
+1 1 2 3 5 8 13 21 34 
+\end{minted}
+如果模块被导入，不会执行这段代码:
+\begin{minted}{python}
+>>> import fibo
+>>>
+\end{minted}
+这通常用来为模块提供一个便于测试的用户接口（将模块作为脚本执行测试需求）。
+\subsection*{(2)模块的搜索路径}
+\subparagraph*{}
+导入一个叫 spam 的模块时，解释器先在当前目录中搜索名为 spam.py 的文件。如果没有找到,接着会到 sys.path 变量中给出的目录列表中查找。 sys.path 变量的初始值来自如下:
+\begin{itemize}
+   \item 输入脚本的目录（当前目录）。
+   \item 环境变量PYTHONPATH表示的目录列表中搜索
+   (这和 shell 变量 PATH 具有一样的语法，即一系列目录名的列表)。
+   \item Python 默认安装路径中搜索
+   包含符号链接的目录不会被加到目录搜索路径中
+\end{itemize}
+\subparagraph*{}
+实际上，解释器由 sys.path 变量指定的路径目录搜索模块，该变量初始化时默认包含了输入脚本（或者当前目录）， PYTHONPATH 和安装目录。这样就允许 Python 程序了解如何修改或替换模块搜索目录。
+\subparagraph*{}
+注意：于这些目录中包含有搜索路径中运行的脚本，所以这些脚本不应该和标准模块重名，否则在导入模块时 Python 会尝试把这些脚本当作模块来加载。这通常会引发错误。
+\subsection*{(3)“编译的”Python文件}
+\subparagraph*{}
+为了加快加载模块的速度，Python 会在 \_{}pycache\_{} 目录下以 module.version.pyc 名字缓存每个模块编译后的版本，这里的版本编制了编译后文件的格式。它通常会包含 Python 的版本号。例如，在 CPython 3.3 版中，spam.py 编译后的版本将缓存为 \_{}pycache\_{}/spam.cpython-33.pyc。这种命名约定允许由不同发布和不同版本的 Python 编译的模块同时存在。
+\subparagraph*{}
+Python 会检查源文件与编译版的修改日期以确定它是否过期并需要重新编译。这是完全自动化的过程。同时，编译后的模块是跨平台的，所以同一个库可以在不同架构的系统之间共享。
+Python 不检查在两个不同环境中的缓存。首先，它会永远重新编译而且不会存储直接从命令行加载的模块。其次，如果没有源模块它不会检查缓存。若要支持没有源文件（只有编译版）的发布，编译后的模块必须在源目录下，并且必须没有源文件的模块。
+\subparagraph*{}
+部分高级技巧:
+\begin{itemize}
+   \item 为了减少一个编译模块的大小，你可以在 Python 命令行中使用 \-{}O 或者 \-{}OO。\-{}O 参数删除了断言语句，\-{}OO 参数删除了断言语句和 \_{}doc\_{} 字符串。
+   因为某些程序依赖于这些变量的可用性，只在确定无误的场合使用这一选项。“优化的” 模块有一个 .pyo 后缀而不是 .pyc 后缀。未来的版本可能会改变优化的效果。
+   \item 来自 .pyc 文件或 .pyo 文件中的程序不会比来自 .py 文件的运行更快；.pyc 或 .pyo 文件只是在它们加载的时候更快一些。
+   \item compileall 模块可以为指定目录中的所有模块创建 .pyc 文件（或者使用 \-{}O 参数创建 .pyo 文件）。
+   \item 在 PEP 3147 中有很多关这一部分内容的细节，并且包含了一个决策流程。
+\end{itemize}
+\section*{2.标准模块}
+\subparagraph*{}
+Python 带有一个标准模块库，并发布有独立的文档，名为 Python 库参考手册（此后称其为“库参考手册”）。有一些模块内置于解释器之中，这些操作的访问接口不是语言内核的一部分，但是已经内置于解释器了。这既是为了提高效率，也是为了给系统调用等操作系统原生访问提供接口。这类模块集合是一个依赖于底层平台的配置选项。例如，winreg 模块只提供在 Windows 系统上才有。有一个具体的模块值得注意： sys ，这个模块内置于所有的 Python 解释器。变量 sys.ps1 和 sys.ps2 定义了主提示符和辅助提示符字符串:
+\begin{minted}{python}
+>>> import sys
+>>> sys.ps1
+'>>> '
+>>> sys.ps2
+'... '
+>>> sys.ps1 = 'C> '
+C> print('Yuck!')
+Yuck!
+C>
+#这两个变量只在解释器的交互模式下有意义
+\end{minted}
+\subparagraph*{}
+变量 sys.path 是解释器模块搜索路径的字符串列表。它由环境变量 PYTHONPATH 初始化，如果没有设定 PYTHONPATH ，就由内置的默认值初始化。你可以用标准的字符串操作修改它:
+\begin{minted}{python}
+>>> import sys
+>>> sys.path.append('/ufs/guido/lib/python')
+\end{minted}
+\section*{3.dir()函数}
+内置函数 dir() 用于按模块名搜索模块定义，它返回一个字符串类型的存储列表:
+\begin{minted}{python}
+>>> import fibo, sys
+>>> dir(fibo)
+['__name__', 'fib', 'fib2']
+>>> dir(sys)  
+['__displayhook__', '__doc__', '__excepthook__', '__loader__', '__name__',
+ '__package__', '__stderr__', '__stdin__', '__stdout__',
+ '_clear_type_cache', '_current_frames', '_debugmallocstats', '_getframe',
+ '_home', '_mercurial', '_xoptions', 'abiflags', 'api_version', 'argv',
+ 'base_exec_prefix', 'base_prefix', 'builtin_module_names', 'byteorder',
+ 'call_tracing', 'callstats', 'copyright', 'displayhook',
+ 'dont_write_bytecode', 'exc_info', 'excepthook', 'exec_prefix',
+ 'executable', 'exit', 'flags', 'float_info', 'float_repr_style',
+ 'getcheckinterval', 'getdefaultencoding', 'getdlopenflags',
+ 'getfilesystemencoding', 'getobjects', 'getprofile', 'getrecursionlimit',
+ 'getrefcount', 'getsizeof', 'getswitchinterval', 'gettotalrefcount',
+ 'gettrace', 'hash_info', 'hexversion', 'implementation', 'int_info',
+ 'intern', 'maxsize', 'maxunicode', 'meta_path', 'modules', 'path',
+ 'path_hooks', 'path_importer_cache', 'platform', 'prefix', 'ps1',
+ 'setcheckinterval', 'setdlopenflags', 'setprofile', 'setrecursionlimit',
+ 'setswitchinterval', 'settrace', 'stderr', 'stdin', 'stdout',
+ 'thread_info', 'version', 'version_info', 'warnoptions']
+\end{minted}
+无参数调用时，dir() 函数返回当前定义的命名:
+\begin{minted}{python}
+>>> a = [1, 2, 3, 4, 5]
+>>> import fibo
+>>> fib = fibo.fib
+>>> dir()
+['__builtins__', '__doc__', '__file__', '__name__', 'a', 'fib', 'fibo', 'sys']
+\end{minted}
+注意该列表列出了所有类型的名称：变量，模块，函数，等等。\\
+dir() 不会列出内置函数和变量名。如果你想列出这些内容，它们在标准模块 builtins 中定义:
+\begin{minted}{python}
+>>> import builtins
+>>> dir(builtins)  
+['ArithmeticError', 'AssertionError', 'AttributeError', 'BaseException',
+ 'BlockingIOError', 'BrokenPipeError', 'BufferError', 'BytesWarning',
+ 'ChildProcessError', 'ConnectionAbortedError', 'ConnectionError',
+ 'ConnectionRefusedError', 'ConnectionResetError', 'DeprecationWarning',
+ 'EOFError', 'Ellipsis', 'EnvironmentError', 'Exception', 'False',
+ 'FileExistsError', 'FileNotFoundError', 'FloatingPointError',
+ 'FutureWarning', 'GeneratorExit', 'IOError', 'ImportError',
+ 'ImportWarning', 'IndentationError', 'IndexError', 'InterruptedError',
+ 'IsADirectoryError', 'KeyError', 'KeyboardInterrupt', 'LookupError',
+ 'MemoryError', 'NameError', 'None', 'NotADirectoryError', 'NotImplemented',
+ 'NotImplementedError', 'OSError', 'OverflowError',
+ 'PendingDeprecationWarning', 'PermissionError', 'ProcessLookupError',
+ 'ReferenceError', 'ResourceWarning', 'RuntimeError', 'RuntimeWarning',
+ 'StopIteration', 'SyntaxError', 'SyntaxWarning', 'SystemError',
+ 'SystemExit', 'TabError', 'TimeoutError', 'True', 'TypeError',
+ 'UnboundLocalError', 'UnicodeDecodeError', 'UnicodeEncodeError',
+ 'UnicodeError', 'UnicodeTranslateError', 'UnicodeWarning', 'UserWarning',
+ 'ValueError', 'Warning', 'ZeroDivisionError', '_', '__build_class__',
+ '__debug__', '__doc__', '__import__', '__name__', '__package__', 'abs',
+ 'all', 'any', 'ascii', 'bin', 'bool', 'bytearray', 'bytes', 'callable',
+ 'chr', 'classmethod', 'compile', 'complex', 'copyright', 'credits',
+ 'delattr', 'dict', 'dir', 'divmod', 'enumerate', 'eval', 'exec', 'exit',
+ 'filter', 'float', 'format', 'frozenset', 'getattr', 'globals', 'hasattr',
+ 'hash', 'help', 'hex', 'id', 'input', 'int', 'isinstance', 'issubclass',
+ 'iter', 'len', 'license', 'list', 'locals', 'map', 'max', 'memoryview',
+ 'min', 'next', 'object', 'oct', 'open', 'ord', 'pow', 'print', 'property',
+ 'quit', 'range', 'repr', 'reversed', 'round', 'set', 'setattr', 'slice',
+ 'sorted', 'staticmethod', 'str', 'sum', 'super', 'tuple', 'type', 'vars',
+ 'zip']
+\end{minted}
+\section*{4.包}
+\subparagraph*{}
+包通常是使用用“圆点模块名”的结构化模块命名空间。例如，名为 A.B 的模块表示了名为 A 的包中名为 B 的子模块。正如同用模块来保存不同的模块架构可以避免全局变量之间的相互冲突，使用圆点模块名保存像 NumPy 或 Python Imaging Library 之类的不同类库架构可以避免模块之间的命名冲突。
+\subparagraph*{}
+设计一个模块集（一个“包”）来统一处理声音文件和声音数据。存在几种不同的声音格式（通常由它们的扩展名来标识，例如：.wav， .aiff，.au ），于是，为了在不同类型的文件格式之间转换，你需要维护一个不断增长的包集合。可能你还想要对声音数据做很多不同的操作（例如混音，添加回声，应用平衡 功能，创建一个人造效果），所以你要加入一个无限流模块来执行这些操作。你的包可能会是这个样子（通过分级的文件体系来进行分组）:
+\begin{minted}{python}
+sound/                          Top-level package
+      __init__.py               Initialize the sound package
+      formats/                  Subpackage for file format conversions
+              __init__.py
+              wavread.py
+              wavwrite.py
+              aiffread.py
+              aiffwrite.py
+              auread.py
+              auwrite.py
+              ...
+      effects/                  Subpackage for sound effects
+              __init__.py
+              echo.py
+              surround.py
+              reverse.py
+              ...
+      filters/                  Subpackage for filters
+              __init__.py
+              equalizer.py
+              vocoder.py
+              karaoke.py
+              ...
+\end{minted}
+\subparagraph*{}
+当导入这个包时，Python 通过 sys.path 搜索路径查找包含这个包的子目录。
+\subparagraph*{}
+为了让 Python 将目录当做内容包，目录中必须包含 \_{}init\_{}.py 文件。这是为了避免一个含有烂俗名字的目录无意中隐藏了稍后在模块搜索路径中出现的有效模块，比如 string。最简单的情况下，只需要一个空的 \_{}init\_{}.py 文件即可。当然它也可以执行包的初始化代码，或者定义稍后介绍的 \_{}all\_{} 变量。
+\subparagraph*{}
+用户可以每次只导入包里的特定模块，例如:
+\begin{minted}{python}
+import sound.effects.echo
+\end{minted}
+\subparagraph*{}
+这样就导入了 sound.effects.echo 子模块。它必需通过完整的名称来引用:
+\begin{minted}{python}
+sound.effects.echo.echofilter(input, output, delay=0.7, atten=4)
+\end{minted}
+\subparagraph*{}
+导入包时有一个可以选择的方式:
+\begin{minted}{python}
+from sound.effects import echo
+\end{minted}
+\subparagraph*{}
+这样就加载了 echo 子模块，并且使得它在没有包前缀的情况下也可以使用，所以它可以如下方式调用:
+\begin{minted}{python}
+echo.echofilter(input, output, delay=0.7, atten=4)
+\end{minted}
+\subparagraph*{}
+还有另一种变体用于直接导入函数或变量:
+\begin{minted}{python}
+from sound.effects.echo import echofilter
+\end{minted}
+\subparagraph*{}
+这样就又一次加载了 echo 子模块，但这样就可以直接调用它的 echofilter() 函数:
+\begin{minted}{python}
+echofilter(input, output, delay=0.7, atten=4)
+\end{minted}
+\subparagraph*{}
+使用 from package import item 方式导入包时，这个子项（item）既可以是包中的一个子模块（或一个子包），也可以是包中定义的其它命名，像函数、类或变量。import 语句首先核对是否包中有这个子项，如果没有，它假定这是一个模块，并尝试加载它。如果没有找到它，会引发一个 ImportError 异常。
+\subparagraph*{}
+相反，使用类似 import item.subitem.subsubitem 这样的语法时，这些子项必须是包，最后的子项可以是包或模块，但不能是前面子项中定义的类、函数或变量。
+\subsection*{(1)从*导入包}
+\subparagraph*{}
+当用户写下 from sound.effects import * 时会发生什么事？理想中，总是希望在文件系统中找出包中所有的子模块，然后导入它们。这可能会花掉很长时间，并且出现期待之外的边界效应，导出了希望只能显式导入的包。
+\subparagraph*{}
+对于包的作者来说唯一的解决方案就是给提供一个明确的包索引。import 语句按如下条件进行转换：执行 from package import * 时，如果包中的 \_{}init\_{}.py 代码定义了一个名为 \_{}all\_{} 的列表，就会按照列表中给出的模块名进行导入。新版本的包发布时作者可以任意更新这个列表。如果包作者不想 import * 的时候导入他们的包中所有模块，那么也可能会决定不支持它（ import * ）。例如， sound/effects/\_{}init\_{}.py 这个文件可能包括如下代码:
+\begin{minted}{python}
+__all__ = ["echo", "surround", "reverse"]
+\end{minted}
+这意味着 
+\begin{minted}{python}
+from sound.effects import *
+\end{minted}
+会从 sound 包中导入以上三个已命名的子模块。
+\subparagraph*{}
+如果没有定义 \_{}all\_{} ， from sound.effects import * 语句 不会 从 sound.effects 包中导入所有的子模块。无论包中定义多少命名，只能确定的是导入了 sound.effects 包（可能会运行 \_{}init\_{}.py 中的初始化代码）以及包中定义的所有命名会随之导入。这样就从 \_{}init\_{}.py 中导入了每一个命名（以及明确导入的子模块）。同样也包括了前述的 import 语句从包中明确导入的子模块，考虑以下代码:
+\begin{minted}{python}
+import sound.effects.echo
+import sound.effects.surround
+from sound.effects import *
+\end{minted}
+\subparagraph*{}
+echo 和 surround 模块导入了当前的命名空间，这是因为执行 from...import 语句时它们已经定义在 sound.effects 包中了（定义了 \_{}all\_{} 时也会同样工作）。
+\subparagraph*{}
+尽管某些模块设计为使用 import * 时它只导出符合某种规范/模式的命名，仍然不建议在生产代码中使用这种写法。
+\begin{minted}{python}
+from Package import specific_submodule
+\end{minted}
+\subparagraph*{}
+这句语句没有错误！事实上，除非导入的模块需要使用其它包中的同名子模块，否则这是推荐的写法。
+\subsection*{(2)包内引用}
+\subparagraph*{}
+如果包中使用了子包结构（就像示例中的 sound 包），可以按绝对位置从相邻的包中引入子模块。例如，如果 sound.filters.vocoder 包需要使用 sound.effects 包中的 echo 模块，它可以 from sound.Effects import echo。
+\subparagraph*{}
+用这样的形式 from module import name 来写显式的相对位置导入。那些显式相对导入用点号标明关联导入当前和上级包。以 surround 模块为例，你可以这样用:
+\begin{minted}{python}
+from . import echo
+from .. import formats
+from ..filters import equalizer
+\end{minted}
+注意：显式或隐式相对位置导入都基于当前模块的命名。因为主模块的名字总是 "\_{}main\_{}"，Python 应用程序的主模块应该总是用绝对导入。
+\subsection*{(3)多重目录中的包}
+\subparagraph*{}
+包支持一个更为特殊的特性， \_{}path\_{}。 在包的 \_{}init\_{}.py 文件代码执行之前，该变量初始化一个目录名列表。该变量可以修改，它作用于包中的子包和模块的搜索功能。
+\subparagraph*{}
+此功能可以用于扩展包中的模块集，但不常用。
+\part*{七、输入和输出}
+\section*{1.格式化输出}
+\subsubsection*{表达式语句}
+\subsubsection*{print()函数}
+\begin{minted}{python}
+>>> s = 'Hello, world.'
+>>> str(s)
+'Hello, world.'
+>>> repr(s)
+"'Hello, world.'"
+>>> str(1/7)
+'0.14285714285714285'
+>>> x = 10 * 3.25
+>>> y = 200 * 200
+>>> s = 'The value of x is ' + repr(x) + ', and y is ' + repr(y) + '...'
+>>> print(s)
+The value of x is 32.5, and y is 40000...
+>>> # The repr() of a string adds string quotes and backslashes:
+... hello = 'hello, world\n'
+>>> hellos = repr(hello)
+>>> print(hellos)
+'hello, world\n'
+>>> # The argument to repr() may be any Python object:
+... repr((x, y, ('spam', 'eggs')))
+"(32.5, 40000, ('spam', 'eggs'))"
+>>>
+\end{minted}
+两种方式可以写平方和立方表：
+\begin{minted}{python}
+>>> for x in range(1, 11):
+...     print(repr(x).rjust(2), repr(x*x).rjust(3), end=' ')
+...     # Note use of 'end' on previous line
+...     print(repr(x*x*x).rjust(4))
+...
+ 1   1    1
+ 2   4    8
+ 3   9   27
+ 4  16   64
+ 5  25  125
+ 6  36  216
+ 7  49  343
+ 8  64  512
+ 9  81  729
+10 100 1000
+
+>>> for x in range(1, 11):
+...     print('{0:2d} {1:3d} {2:4d}'.format(x, x*x, x*x*x))
+...
+ 1   1    1
+ 2   4    8
+ 3   9   27
+ 4  16   64
+ 5  25  125
+ 6  36  216
+ 7  49  343
+ 8  64  512
+ 9  81  729
+10 100 1000
+>>>
+#print()在每列之间加了一个空格，它总是在参数间加入空格
+\end{minted}
+以上是一个 str.rjust() 方法的演示，它把字符串输出到一列，并通过向左侧填充空格来使其右对齐。类似的方法还有 str.ljust() 和 str.center()。这些函数只是输出新的字符串，并不改变什么。如果输出的字符串太长，它们也不会截断它，而是原样输出，这会使你的输出格式变得混乱，不过总强过另一种选择（截断字符串），因为那样会产生错误的输出值（如果你确实需要截断它，可以使用切割操作，例如：
+\begin{minted}{python}
+x.ljust(n)[:n] 
+\end{minted}
+str.zfill() 它用于向数值的字符串表达左侧填充 0。该函数可以正确理解正负号:
+\begin{minted}{python}
+>>> '12'.zfill(5)
+'00012'
+>>> '-3.14'.zfill(7)
+'-003.14'
+>>> '3.14159265359'.zfill(5)
+'3.14159265359'
+\end{minted}
+方法str.format()的基本使用方法如下：
+\begin{minted}{python}
+>>> print('We are the {} who say "{}!"'.format('knights', 'Ni'))
+We are the knights who say "Ni!"
+\end{minted}
+大括号和其中的字符会被替换成传入 str.format() 的参数。大括号中的数值指明使用传入 str.format() 方法的对象中的哪一个:
+\begin{minted}{python}
+>>> print('{0} and {1}'.format('spam', 'eggs'))
+spam and eggs
+>>> print('{1} and {0}'.format('spam', 'eggs'))
+eggs and spam
+\end{minted}
+如果在 str.format() 调用时使用关键字参数，可以通过参数名来引用值:
+\begin{minted}{python}
+>>> print('This {food} is {adjective}.'.format(
+...       food='spam', adjective='absolutely horrible'))
+This spam is absolutely horrible.
+\end{minted}
+位置参数和关键字参数可以随意组合:
+\begin{minted}{python}
+>>> print('The story of {0}, {1}, and {other}.'.format('Bill', 'Manfred',
+                                                       other='Georg'))
+The story of Bill, Manfred, and Georg.
+\end{minted}
+'!a' (应用 ascii())，'!s' （应用 str() ）和 '!r' （应用 repr() ）可以在格式化之前转换值:
+\begin{minted}{python}
+>>> import math
+>>> print('The value of PI is approximately {}.'.format(math.pi))
+The value of PI is approximately 3.14159265359.
+>>> print('The value of PI is approximately {!r}.'.format(math.pi))
+The value of PI is approximately 3.141592653589793.
+\end{minted}
+字段名后允许可选的 ':' 和格式指令。这允许对值的格式化加以更深入的控制。下例将 Pi 转为三位精度。
+\begin{minted}{python}
+>>> import math
+>>> print('The value of PI is approximately {0:.3f}.'.format(math.pi))
+The value of PI is approximately 3.142.
+\end{minted}
+在字段后的 ':' 后面加一个整数会限定该字段的最小宽度，这在美化表格时很有用:
+\begin{minted}{python}
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 7678}
+>>> for name, phone in table.items():
+...     print('{0:10} ==> {1:10d}'.format(name, phone))
+...
+Jack       ==>       4098
+Dcab       ==>       7678
+Sjoerd     ==>       4127
+\end{minted}
+很长的格式化字符串，不想分割它。如果你可以用命名来引用被格式化的变量而不是位置就好了。有个简单的方法，可以传入一个字典，用中括号( '[]' )访问它的键:
+\begin{minted}{python}
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
+>>> print('Jack: {0[Jack]:d}; Sjoerd: {0[Sjoerd]:d}; '
+          'Dcab: {0[Dcab]:d}'.format(table))
+Jack: 4098; Sjoerd: 4127; Dcab: 8637678
+\end{minted}
+可以用 ‘**’ 标志将这个字典以关键字参数的方式传入:
+\begin{minted}{python}
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
+>>> print('Jack: {Jack:d}; Sjoerd: {Sjoerd:d}; Dcab: {Dcab:d}'.format(**table))
+Jack: 4098; Sjoerd: 4127; Dcab: 8637678
+\end{minted}
+这种方式与新的内置函数 vars() 组合使用非常有效。该函数返回包含所有局部变量的字典。
+\subsection*{(1)旧使的字符串格式化}
+操作符\%{}也可以用于字符串格式化。它以类似 sprintf()-style 的方式解析左参数，将右参数应用于此，得到格式化操作生成的字符串，例如:
+\begin{minted}{python}
+>>> import math
+>>> print('The value of PI is approximately %5.3f.' % math.pi)
+The value of PI is approximately 3.142.
+\end{minted}
+\section*{2.文件读写}
+\subparagraph*{}
+函数 open() 返回 文件对象，通常的用法需要两个参数：open(filename, mode)。
+\begin{minted}{python}
+>>> f = open('workfile', 'w')
+\end{minted}
+\subparagraph*{}
+第一个参数是一个含有文件名的字符串。第二个参数也是一个字符串，含有描述如何使用该文件的几个字符。mode 为 'r' 时表示只是读取文件；'w' 表示只是写入文件（已经存在的同名文件将被删掉）；'a' 表示打开文件进行追加，写入到文件中的任何数据将自动添加到末尾。 'r+' 表示打开文件进行读取和写入。mode 参数是可选的，默认为 'r'。
+\subparagraph*{}
+通常，文件以 文本 打开，这意味着，你从文件读出和向文件写入的字符串会被特定的编码方式（默认是UTF-8）编码。模式后面的 'b' 以 二进制模式 打开文件：数据会以字节对象的形式读出和写入。这种模式应该用于所有不包含文本的文件。
+\subparagraph*{}
+在文本模式下，读取时默认会将平台有关的行结束符（Unix上是 $\backslash$n , Windows上是$\backslash$r$\backslash$n）转换为 $\backslash$n。在文本模式下写入时，默认会将出现的 $\backslash$n 转换成平台有关的行结束符。这种暗地里的修改对 ASCII 文本文件没有问题，但会损坏 JPEG 或 EXE 这样的二进制文件中的数据。使用二进制模式读写此类文件时要特别小心。
+\subsection*{(1)文件对象方法}
+\subparagraph*{}
+首先示例默认文件对象 f 已经创建
+\subparagraph*{}
+要读取文件内容，需要调用 f.read(size)，该方法读取若干数量的数据并以字符串形式返回其内容，size 是可选的数值，指定字符串长度。如果没有指定 size 或者指定为负数，就会读取并返回整个文件。当文件大小为当前机器内存两倍时，就会产生问题。反之，会尽可能按比较大的 size 读取和返回数据。如果到了文件末尾，f.read() 会返回一个空字符串（''）:
+\begin{minted}{python}
+>>> f.read()
+'This is the entire file.\n'
+>>> f.read()
+''
+\end{minted}
+\subparagraph*{}
+f.readline() 从文件中读取单独一行，字符串结尾会自动加上一个换行符（ $\backslash$n ），只有当文件最后一行没有以换行符结尾时，这一操作才会被忽略。这样返回值就不会有混淆，如果 f.readline() 返回一个空字符串，那就表示到达了文件末尾，如果是一个空行，就会描述为 '$\backslash$n'，一个只包含换行符的字符串:
+\begin{minted}{python}
+>>> f.readline()
+'This is the first line of the file.\n'
+>>> f.readline()
+'Second line of the file\n'
+>>> f.readline()
+''
+\end{minted}
+\subparagraph*{}
+可以循环遍历文件对象来读取文件中的每一行。这是一种内存高效、快速，并且代码简介的方式:
+\begin{minted}{python}
+>>> for line in f:
+...     print(line, end='')
+...
+This is the first line of the file.
+Second line of the file
+
+\end{minted}
+\subparagraph*{}
+把文件中的所有行读到一个列表中，可以使用 list(f) 或者 f.readlines()。
+\subparagraph*{}
+f.write(string) 方法将 string 的内容写入文件，并返回写入字符的长度:
+\begin{minted}{python}
+>>> f.write('This is a test\n')
+15
+\end{minted}
+\subparagraph*{}
+写入其他非字符串内容，首先要将它转换为字符串:
+\begin{minted}{python}
+>>> value = ('the answer', 42)
+>>> s = str(value)
+>>> f.write(s)
+18
+\end{minted}
+\subparagraph*{}
+f.tell() 返回一个整数，代表文件对象在文件中的指针位置，该数值计量了自文件开头到指针处的比特数。需要改变文件对象指针话话，使用 f.seek(offset,from\_{}what)。指针在该操作中从指定的引用位置移动 offset 比特，引用位置由 from\_{}what 参数指定。 from\_{}what 值为 0 表示自文件起始处开始，1 表示自当前文件指针位置开始，2 表示自文件末尾开始。from\_{}what 可以忽略，其默认值为零，此时从文件头开始:
+\begin{minted}{python}
+>>> f = open('workfile', 'rb+')
+>>> f.write(b'0123456789abcdef')
+16
+>>> f.seek(5)     # Go to the 6th byte in the file
+5
+>>> f.read(1)
+b'5'
+>>> f.seek(-3, 2) # Go to the 3rd byte before the end
+13
+>>> f.read(1)
+b'd'
+\end{minted}
+\subparagraph*{}
+在文本文件中（没有以 b 模式打开），只允许从文件头开始寻找（有个例外是用 seek(0, 2) 寻找文件的最末尾处）而且合法的 偏移 值只能是 f.tell() 返回的值或者是零。其它任何 偏移 值都会产生未定义的行为。
+\subparagraph*{}
+当你使用完一个文件时，调用 f.close() 方法就可以关闭它并释放其占用的所有系统资源。 在调用 f.close() 方法后，试图再次使用文件对象将会自动失败。
+\begin{minted}{python}
+>>> f.close()
+>>> f.read()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in ?
+ValueError: I/O operation on closed file
+\end{minted}
+\subparagraph*{}
+用关键字 with 处理文件对象是个好习惯。它的先进之处在于文件用完后会自动关闭，就算发生异常也没关系。它是 try-finally 块的简写:
+\begin{minted}{python}
+>>> with open('workfile', 'r') as f:
+...     read_data = f.read()
+>>> f.closed
+True
+\end{minted}
+\subsection*{(2)使用json存储结构化数据}
+\subparagraph*{}
+从文件中读写字符串很容易。数值就不是这样，因为 read() 方法只会返回字符串，应将其传入 int() 这样的函数，就可以将 '123' 这样的字符串转换为对应的数值 123。当你想要保存更为复杂的数据类型，例如嵌套的列表和字典，手工解析和序列化它们将变得更复杂。
+\subparagraph*{}
+用户不是非得自己编写和调试保存复杂数据类型的代码，Python 允许你使用常用的数据交换格式 JSON（JavaScript Object Notation）。标准模块 json 可以接受 Python 数据结构，并将它们转换为字符串表示形式；此过程称为 序列化。从字符串表示形式重新构建数据结构称为 反序列化。序列化和反序列化的过程中，表示该对象的字符串可以存储在文件或数据中，也可以通过网络连接传送给远程的机器。
+\subparagraph*{}
+如果你有一个对象 x，你可以用简单的一行代码查看其 JSON 字符串表示形式:
+\begin{minted}{python}
+>>> json.dumps([1, 'simple', 'list'])
+'[1, "simple", "list"]'
+\end{minted}
+\subparagraph*{}
+dumps() 函数的另外一个变体 dump()，直接将对象序列化到一个文件。所以如果 f 是为写入而打开的一个 文件对象，我们可以这样做:
+\begin{minted}{python}
+json.dump(x, f)
+\end{minted}
+\subparagraph*{}
+为了重新解码对象，如果 f 是为读取而打开的 文件对象:
+\begin{minted}{python}
+x = json.load(f)
+\end{minted}
 \end{CJK}
 \end{document}
